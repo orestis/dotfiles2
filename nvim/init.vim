@@ -5,6 +5,7 @@ Plug 'tpope/vim-surround'
 Plug 'tpope/vim-repeat'
 Plug 'tpope/vim-fugitive'
 Plug 'tpope/vim-commentary'
+Plug 'tpope/vim-eunuch'
 
 Plug 'NLKNguyen/papercolor-theme'
 
@@ -13,7 +14,7 @@ Plug 'liuchengxu/vim-better-default'
 Plug 'machakann/vim-highlightedyank'
 Plug 'guns/vim-sexp'
 Plug 'pechorin/any-jump.vim'
-"Plug 'tpope/vim-sexp-mappings-for-regular-people'
+Plug 'tpope/vim-sexp-mappings-for-regular-people'
 Plug 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' }
 Plug 'ncm2/float-preview.nvim'
 Plug 'jiangmiao/auto-pairs', { 'tag': 'v2.0.0' }
@@ -22,9 +23,13 @@ Plug 'vim-airline/vim-airline'
 Plug 'vim-airline/vim-airline-themes'
 Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
 Plug 'junegunn/fzf.vim'
-Plug 'Olical/conjure', {'tag': 'v4.3.0'}
+Plug 'Olical/conjure', {'tag': 'v4.12.0'}
+Plug 'jparise/vim-graphql'
+" Plug 'gberenfield/cljfold.vim'
 Plug 'kassio/neoterm'
 Plug 'editorconfig/editorconfig-vim'
+Plug 'bakpakin/fennel.vim'
+Plug 'Olical/aniseed', { 'tag': 'v3.11.0' }
 " Initialize plugin system.
 call plug#end()
 
@@ -49,6 +54,7 @@ let g:airline_filetype_overrides = {
 \ }
 
 """"""""
+let g:clojure_foldwords = "def,defn,defnc,defmacro,defmethod,defschema,defprotocol,defrecord,comment"
 au Filetype clojure let b:AutoPairs = {'(':')', '[':']', '{':'}', '"':'"'}
 
 """" Load the theme
