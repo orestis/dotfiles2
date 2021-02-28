@@ -1,12 +1,7 @@
 require'nvim-treesitter.configs'.setup {
-  ensure_installed = {"clojure"}, -- one of "all", "maintained" (parsers with maintainers), or a list of languages
+  ensure_installed = "maintained", -- one of "all", "maintained" (parsers with maintainers), or a list of languages
   highlight = {
-    -- enable = false ,     -- false will disable the whole extension
-    enable = { "clojure" },     -- false will disable the whole extension
-    custom_captures = {
-      -- Highlight the @foo.bar capture group with the "Identifier" highlight group.
-      ["function.builtin"] = "FunctionBuiltin",
-    },
+    enable = false ,     -- false will disable the whole extension
     disable = { "c", "rust" },  -- list of language that will be disabled
   },
 }
@@ -47,9 +42,9 @@ local on_attach = function(client, bufnr)
   if client.resolved_capabilities.document_highlight then
     -- TODO change the colors
     vim.api.nvim_exec([[
-      hi LspReferenceRead cterm=bold ctermbg=red guibg=LightYellow
-      hi LspReferenceText cterm=bold ctermbg=red guibg=LightYellow
-      hi LspReferenceWrite cterm=bold ctermbg=red guibg=LightYellow
+      hi LspReferenceRead gui=underline,bold,reverse
+      hi LspReferenceText gui=underline,bold,reverse
+      hi LspReferenceWrite gui=underline,bold,reverse
       augroup lsp_document_highlight
         autocmd! * <buffer>
         autocmd CursorHold <buffer> lua vim.lsp.buf.document_highlight()

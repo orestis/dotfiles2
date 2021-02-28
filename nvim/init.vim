@@ -17,8 +17,8 @@ Plug 'tpope/vim-sexp-mappings-for-regular-people'
 Plug 'ncm2/float-preview.nvim'
 Plug 'jiangmiao/auto-pairs', { 'tag': 'v2.0.0' }
 Plug 'w0rp/ale'
-" Plug 'vim-airline/vim-airline'
-" Plug 'vim-airline/vim-airline-themes'
+Plug 'vim-airline/vim-airline'
+Plug 'vim-airline/vim-airline-themes'
 Plug 'Olical/conjure', {'tag': 'v4.15.0'}
 Plug 'jparise/vim-graphql'
 " Plug 'gberenfield/cljfold.vim'
@@ -29,19 +29,23 @@ Plug 'bakpakin/fennel.vim'
 Plug 'Olical/aniseed', { 'tag': 'v3.11.0' }
 " Neovim 0.5 stuff
 Plug 'neovim/nvim-lspconfig'
+Plug 'glepnir/lspsaga.nvim'
+
 Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}
 Plug 'nvim-treesitter/playground'
+
 Plug 'nvim-lua/popup.nvim'
 Plug 'nvim-lua/plenary.nvim'
 Plug 'nvim-telescope/telescope.nvim'
-Plug 'ojroques/nvim-hardline'
-Plug 'rktjmp/lush.nvim'
+
+Plug 'hrsh7th/nvim-compe'
+Plug 'TimUntersberger/neogit'
 
 
-" Plug 'pechorin/any-jump.vim'
 " Plug 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' }
-" Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
-" Plug 'junegunn/fzf.vim'
+" telescope is buggy, use this as a backup
+Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
+Plug 'junegunn/fzf.vim'
 " Initialize plugin system.
 call plug#end()
 
@@ -60,10 +64,10 @@ autocmd FocusGained * checktime
 
 
 " Nobody cares about position in the file, we have line numbers
-" let g:airline_section_z = ''
-" let g:airline#parts#ffenc#skip_expected_string='utf-8[unix]'
-" let g:airline_filetype_overrides = {
-" \ }
+let g:airline_section_z = ''
+let g:airline#parts#ffenc#skip_expected_string='utf-8[unix]'
+let g:airline_filetype_overrides = {
+\ }
 
 """"""""
 let g:clojure_foldwords = "def,defn,defnc,defmacro,defmethod,defschema,defprotocol,defrecord,comment"
@@ -73,16 +77,27 @@ au Filetype clojure let b:AutoPairs = {'(':')', '[':']', '{':'}', '"':'"'}
 if (has("termguicolors"))
     set termguicolors
 endif
-""let g:airline_theme='papercolor'
-""colorscheme PaperColor
-" let g:sonokai_style = 'andromeda'
-" let g:sonokai_enable_italic = 1
-" let g:sonokai_disable_italic_comment = 1
-" colorscheme sonokai
-" lua require('hardline').setup {}
-colorscheme lawn
+let g:airline_theme='papercolor'
+colorscheme PaperColor
 
-""""""""""""""""""
+"nvim-compe
+lua << EOF
+  require'conf_compe'
+EOF
+inoremap <silent><expr> <TAB>  pumvisible() ? "\<C-n>" :  <SID>check_back_space() ? "\<TAB>" :  compe#complete()
+function! s:check_back_space() abort "{{{
+    let col = col('.') - 1
+    return !col || getline('.')[col - 1]  =~ '\s'
+endfunction"}}}
+" inoremap <silent><expr> <C-Space> compe#complete()
+inoremap <silent><expr> <CR>      compe#confirm('<CR>')
+inoremap <silent><expr> <C-e>     compe#close('<C-e>')
+inoremap <silent><expr> <C-f>     compe#scroll({ 'delta': +4 })
+inoremap <silent><expr> <C-d>     compe#scroll({ 'delta': -4 })
+
+
+
+"""""""""""""""""
 "
 " deoplete and floating windows support
 "let g:deoplete#enable_at_startup = 1
@@ -126,6 +141,7 @@ cnoremap <C-e> <End>
 cnoremap <C-d> <Delete>
 
 " FZF
+set rtp+=/opt/homebrew/opt/fzf
 nnoremap <Leader>ff :GFiles<cr>
 nnoremap <Leader>fb :Buffers<cr>
 nnoremap <Leader>fg :Rg<cr>
@@ -143,10 +159,10 @@ let g:ale_linters = {
       \ 'clojure': ['clj-kondo']
       \}
 
-"" jump off to lua
-
+" show the matched syntax
 nnoremap <C-z> :echo "hi<" . synIDattr(synID(line("."),col("."),1),"name") . '> trans<' . synIDattr(synID(line("."),col("."),0),"name") ."> lo<" . synIDattr(synIDtrans(synID(line("."),col("."),1)),"name") . ">"<CR>
 
+"" jump off to lua
 lua << EOF
   require'init'
 EOF
