@@ -13,16 +13,12 @@ Plug 'liuchengxu/vim-which-key'
 Plug 'liuchengxu/vim-better-default'
 Plug 'machakann/vim-highlightedyank'
 Plug 'guns/vim-sexp'
-Plug 'pechorin/any-jump.vim'
 Plug 'tpope/vim-sexp-mappings-for-regular-people'
-Plug 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' }
 Plug 'ncm2/float-preview.nvim'
 Plug 'jiangmiao/auto-pairs', { 'tag': 'v2.0.0' }
 Plug 'w0rp/ale'
-Plug 'vim-airline/vim-airline'
-Plug 'vim-airline/vim-airline-themes'
-Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
-Plug 'junegunn/fzf.vim'
+" Plug 'vim-airline/vim-airline'
+" Plug 'vim-airline/vim-airline-themes'
 Plug 'Olical/conjure', {'tag': 'v4.15.0'}
 Plug 'jparise/vim-graphql'
 " Plug 'gberenfield/cljfold.vim'
@@ -34,6 +30,18 @@ Plug 'Olical/aniseed', { 'tag': 'v3.11.0' }
 " Neovim 0.5 stuff
 Plug 'neovim/nvim-lspconfig'
 Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}
+Plug 'nvim-treesitter/playground'
+Plug 'nvim-lua/popup.nvim'
+Plug 'nvim-lua/plenary.nvim'
+Plug 'nvim-telescope/telescope.nvim'
+Plug 'ojroques/nvim-hardline'
+Plug 'rktjmp/lush.nvim'
+
+
+" Plug 'pechorin/any-jump.vim'
+" Plug 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' }
+" Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
+" Plug 'junegunn/fzf.vim'
 " Initialize plugin system.
 call plug#end()
 
@@ -52,10 +60,10 @@ autocmd FocusGained * checktime
 
 
 " Nobody cares about position in the file, we have line numbers
-let g:airline_section_z = ''
-let g:airline#parts#ffenc#skip_expected_string='utf-8[unix]'
-let g:airline_filetype_overrides = {
-\ }
+" let g:airline_section_z = ''
+" let g:airline#parts#ffenc#skip_expected_string='utf-8[unix]'
+" let g:airline_filetype_overrides = {
+" \ }
 
 """"""""
 let g:clojure_foldwords = "def,defn,defnc,defmacro,defmethod,defschema,defprotocol,defrecord,comment"
@@ -65,25 +73,32 @@ au Filetype clojure let b:AutoPairs = {'(':')', '[':']', '{':'}', '"':'"'}
 if (has("termguicolors"))
     set termguicolors
 endif
-let g:airline_theme='papercolor'
-colorscheme PaperColor
-"""""""""""""""""""
+""let g:airline_theme='papercolor'
+""colorscheme PaperColor
+" let g:sonokai_style = 'andromeda'
+" let g:sonokai_enable_italic = 1
+" let g:sonokai_disable_italic_comment = 1
+" colorscheme sonokai
+" lua require('hardline').setup {}
+colorscheme lawn
+
+""""""""""""""""""
 "
 " deoplete and floating windows support
-let g:deoplete#enable_at_startup = 1
-call deoplete#custom#option('keyword_patterns', {'clojure': '[\w!$%&*+/:<=>?@\^_~\-\.#]*'})
-" don't automatically show completions, wait for TAB to be pressed
-call deoplete#custom#option('auto_complete', v:false)
-set completeopt-=preview
-"let g:float_preview#docked = 0
-"let g:float_preview#max_width = 100
-"let g:float_preview#max_height = 50
-" <TAB>: completion in popup menus
-inoremap <silent><expr> <TAB>  pumvisible() ? "\<C-n>" :  <SID>check_back_space() ? "\<TAB>" :  deoplete#manual_complete()
-function! s:check_back_space() abort "{{{
-    let col = col('.') - 1
-    return !col || getline('.')[col - 1]  =~ '\s'
-endfunction"}}}
+"let g:deoplete#enable_at_startup = 1
+"call deoplete#custom#option('keyword_patterns', {'clojure': '[\w!$%&*+/:<=>?@\^_~\-\.#]*'})
+"" don't automatically show completions, wait for TAB to be pressed
+"call deoplete#custom#option('auto_complete', v:false)
+"set completeopt-=preview
+""let g:float_preview#docked = 0
+""let g:float_preview#max_width = 100
+""let g:float_preview#max_height = 50
+"" <TAB>: completion in popup menus
+"inoremap <silent><expr> <TAB>  pumvisible() ? "\<C-n>" :  <SID>check_back_space() ? "\<TAB>" :  deoplete#manual_complete()
+"function! s:check_back_space() abort "{{{
+"    let col = col('.') - 1
+"    return !col || getline('.')[col - 1]  =~ '\s'
+"endfunction"}}}
 """"""""""""""""""
 
 """"""""" custom keybindings
@@ -129,6 +144,8 @@ let g:ale_linters = {
       \}
 
 "" jump off to lua
+
+nnoremap <C-z> :echo "hi<" . synIDattr(synID(line("."),col("."),1),"name") . '> trans<' . synIDattr(synID(line("."),col("."),0),"name") ."> lo<" . synIDattr(synIDtrans(synID(line("."),col("."),1)),"name") . ">"<CR>
 
 lua << EOF
   require'init'
