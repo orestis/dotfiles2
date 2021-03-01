@@ -1,52 +1,56 @@
 " Specify a directory for plugins.
 call plug#begin(stdpath('data') . '/plugged')
+" languages
+Plug 'jparise/vim-graphql'
+Plug 'clojure-vim/clojure.vim'
+Plug 'bakpakin/fennel.vim'
+Plug 'Olical/aniseed', { 'tag': 'v3.11.0' }
+Plug 'Olical/conjure', {'tag': 'v4.15.0'}
+Plug 'editorconfig/editorconfig-vim'
 
+" vim improvements
 Plug 'tpope/vim-surround'
 Plug 'tpope/vim-repeat'
-Plug 'tpope/vim-fugitive'
 Plug 'tpope/vim-commentary'
+Plug 'jiangmiao/auto-pairs', { 'tag': 'v2.0.0' }
+Plug 'kevinhwang91/nvim-bqf' " quickfix window, investigate
+
+" git
+Plug 'tpope/vim-fugitive'
+Plug 'TimUntersberger/neogit'
+" unix stuff: Delete, Mkdir
 Plug 'tpope/vim-eunuch'
+
+" fuzzy finders
+Plug 'nvim-lua/popup.nvim'
+Plug 'nvim-lua/plenary.nvim'
+Plug 'nvim-telescope/telescope.nvim'
+" above is buggy for now
+Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
+Plug 'junegunn/fzf.vim'
 
 Plug 'NLKNguyen/papercolor-theme'
 
 Plug 'liuchengxu/vim-which-key'
 Plug 'liuchengxu/vim-better-default'
-Plug 'machakann/vim-highlightedyank'
+
 Plug 'guns/vim-sexp'
 Plug 'tpope/vim-sexp-mappings-for-regular-people'
 Plug 'ncm2/float-preview.nvim'
-Plug 'jiangmiao/auto-pairs', { 'tag': 'v2.0.0' }
-Plug 'w0rp/ale'
 Plug 'vim-airline/vim-airline'
 Plug 'vim-airline/vim-airline-themes'
-Plug 'Olical/conjure', {'tag': 'v4.15.0'}
-Plug 'jparise/vim-graphql'
-" Plug 'gberenfield/cljfold.vim'
-Plug 'clojure-vim/clojure.vim'
-Plug 'kassio/neoterm'
-Plug 'editorconfig/editorconfig-vim'
-Plug 'bakpakin/fennel.vim'
-Plug 'Olical/aniseed', { 'tag': 'v3.11.0' }
 " Neovim 0.5 stuff
 Plug 'neovim/nvim-lspconfig'
-Plug 'glepnir/lspsaga.nvim'
-
+Plug 'glepnir/lspsaga.nvim' " TODO see if this is nicer, then replace the builtin ones
 Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}
 Plug 'nvim-treesitter/playground'
 
-Plug 'nvim-lua/popup.nvim'
-Plug 'nvim-lua/plenary.nvim'
-Plug 'nvim-telescope/telescope.nvim'
 
+" linter
+Plug 'w0rp/ale'
+" completion
 Plug 'hrsh7th/nvim-compe'
-Plug 'TimUntersberger/neogit'
-
-
 " Plug 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' }
-" telescope is buggy, use this as a backup
-Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
-Plug 'junegunn/fzf.vim'
-" Initialize plugin system.
 call plug#end()
 
 """" Load better default and override some of the choices there
@@ -61,6 +65,10 @@ set autoread
 set foldmethod=syntax
 autocmd FocusGained * checktime
 """""""""""""""""""
+augroup highlight_yank
+    autocmd!
+    autocmd TextYankPost * silent! lua require'vim.highlight'.on_yank("IncSearch", 1000)
+augroup END
 
 
 " Nobody cares about position in the file, we have line numbers
