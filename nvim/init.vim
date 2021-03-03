@@ -17,14 +17,14 @@ Plug 'kevinhwang91/nvim-bqf' " quickfix window, investigate
 
 " git
 Plug 'tpope/vim-fugitive'
-Plug 'TimUntersberger/neogit'
+" Plug 'TimUntersberger/neogit'
 " unix stuff: Delete, Mkdir
 Plug 'tpope/vim-eunuch'
 
 " fuzzy finders
 Plug 'nvim-lua/popup.nvim'
 Plug 'nvim-lua/plenary.nvim'
-Plug 'nvim-telescope/telescope.nvim'
+"Plug 'nvim-telescope/telescope.nvim'
 " above is buggy for now
 Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
 Plug 'junegunn/fzf.vim'
@@ -45,12 +45,8 @@ Plug 'glepnir/lspsaga.nvim' " TODO see if this is nicer, then replace the builti
 Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}
 Plug 'nvim-treesitter/playground'
 
-
 " linter
 Plug 'w0rp/ale'
-" completion
-Plug 'hrsh7th/nvim-compe'
-" Plug 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' }
 call plug#end()
 
 """" Load better default and override some of the choices there
@@ -88,41 +84,16 @@ endif
 let g:airline_theme='papercolor'
 colorscheme PaperColor
 
-"nvim-compe
-lua << EOF
-  require'conf_compe'
-EOF
-inoremap <silent><expr> <TAB>  pumvisible() ? "\<C-n>" :  <SID>check_back_space() ? "\<TAB>" :  compe#complete()
+""""" completion
+
+set completeopt=menuone,noinsert,noselect
 function! s:check_back_space() abort "{{{
     let col = col('.') - 1
     return !col || getline('.')[col - 1]  =~ '\s'
 endfunction"}}}
-" inoremap <silent><expr> <C-Space> compe#complete()
-inoremap <silent><expr> <CR>      compe#confirm('<CR>')
-inoremap <silent><expr> <C-e>     compe#close('<C-e>')
-inoremap <silent><expr> <C-f>     compe#scroll({ 'delta': +4 })
-inoremap <silent><expr> <C-d>     compe#scroll({ 'delta': -4 })
+inoremap <silent><expr> <TAB>  pumvisible() ? "\<C-n>" :  <SID>check_back_space() ? "\<TAB>" :  "\<C-x>\<C-o>"
+inoremap <silent><expr> <S-TAB>  pumvisible() ? "\<C-p>" :  "\<S-TAB>"
 
-
-
-"""""""""""""""""
-"
-" deoplete and floating windows support
-"let g:deoplete#enable_at_startup = 1
-"call deoplete#custom#option('keyword_patterns', {'clojure': '[\w!$%&*+/:<=>?@\^_~\-\.#]*'})
-"" don't automatically show completions, wait for TAB to be pressed
-"call deoplete#custom#option('auto_complete', v:false)
-"set completeopt-=preview
-""let g:float_preview#docked = 0
-""let g:float_preview#max_width = 100
-""let g:float_preview#max_height = 50
-"" <TAB>: completion in popup menus
-"inoremap <silent><expr> <TAB>  pumvisible() ? "\<C-n>" :  <SID>check_back_space() ? "\<TAB>" :  deoplete#manual_complete()
-"function! s:check_back_space() abort "{{{
-"    let col = col('.') - 1
-"    return !col || getline('.')[col - 1]  =~ '\s'
-"endfunction"}}}
-""""""""""""""""""
 
 """"""""" custom keybindings
 " paredit slurp
@@ -150,6 +121,8 @@ cnoremap <C-d> <Delete>
 
 " FZF
 set rtp+=/opt/homebrew/opt/fzf
+set wildcharm=<tab> " so that it can be used below
+nnoremap <Leader>fe :e %:h<tab>
 nnoremap <Leader>ff :GFiles<cr>
 nnoremap <Leader>fb :Buffers<cr>
 nnoremap <Leader>fg :Rg<cr>
@@ -162,7 +135,6 @@ let g:omni_sql_no_default_maps = 1
 let g:clojure_maxlines = 1000
 
 """""" ALE asynchronous linter
-" clojure linters
 let g:ale_linters = {
       \ 'clojure': ['clj-kondo']
       \}
@@ -170,7 +142,15 @@ let g:ale_linters = {
 " show the matched syntax
 nnoremap <C-z> :echo "hi<" . synIDattr(synID(line("."),col("."),1),"name") . '> trans<' . synIDattr(synID(line("."),col("."),0),"name") ."> lo<" . synIDattr(synIDtrans(synID(line("."),col("."),1)),"name") . ">"<CR>
 
-"" jump off to lua
+" restart lsp
+function! LSPRestart()
+    lua vim.lsp.stop_client(vim.lsp.get_active_clients())
+    edit
+endfunction
+command LSPRestart call LSPRestart()
+
+"
+"jump off to lua
 lua << EOF
   require'init'
 EOF
