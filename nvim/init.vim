@@ -4,8 +4,8 @@ call plug#begin(stdpath('data') . '/plugged')
 Plug 'jparise/vim-graphql'
 Plug 'clojure-vim/clojure.vim'
 Plug 'bakpakin/fennel.vim'
-Plug 'Olical/aniseed', { 'tag': 'v3.11.0' }
-Plug 'Olical/conjure', {'tag': 'v4.15.0'}
+Plug 'Olical/aniseed' 
+Plug 'Olical/conjure' 
 Plug 'editorconfig/editorconfig-vim'
 
 " vim improvements
@@ -24,10 +24,14 @@ Plug 'tpope/vim-eunuch'
 " fuzzy finders
 Plug 'nvim-lua/popup.nvim'
 Plug 'nvim-lua/plenary.nvim'
-"Plug 'nvim-telescope/telescope.nvim'
+Plug 'nvim-telescope/telescope.nvim'
+Plug 'nvim-telescope/telescope-fzf-native.nvim', { 'do': 'make' }
+Plug 'nvim-telescope/telescope-live-grep-raw.nvim'
+Plug 'fannheyward/telescope-coc.nvim'
+
 " above is buggy for now
-Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
-Plug 'junegunn/fzf.vim'
+" Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
+" Plug 'junegunn/fzf.vim'
 
 Plug 'NLKNguyen/papercolor-theme'
 
@@ -40,10 +44,13 @@ Plug 'ncm2/float-preview.nvim'
 Plug 'vim-airline/vim-airline'
 Plug 'vim-airline/vim-airline-themes'
 " Neovim 0.5 stuff
-Plug 'neovim/nvim-lspconfig'
-Plug 'glepnir/lspsaga.nvim' " TODO see if this is nicer, then replace the builtin ones
-Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}
-Plug 'nvim-treesitter/playground'
+""Plug 'neovim/nvim-lspconfig'
+""Plug 'glepnir/lspsaga.nvim' " TODO see if this is nicer, then replace the builtin ones
+Plug 'neoclide/coc.nvim', {'branch': 'release'}
+" Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}
+" Plug 'nvim-treesitter/playground'
+Plug 'kyazdani42/nvim-web-devicons'
+Plug 'pwntester/octo.nvim'
 
 " linter
 Plug 'w0rp/ale'
@@ -61,11 +68,11 @@ set autoread
 set foldmethod=syntax
 autocmd FocusGained * checktime
 """""""""""""""""""
+
 augroup highlight_yank
     autocmd!
-    autocmd TextYankPost * silent! lua require'vim.highlight'.on_yank("IncSearch", 1000)
+    au TextYankPost * silent! lua vim.highlight.on_yank { higroup='IncSearch', timeout=200 }
 augroup END
-
 
 " Nobody cares about position in the file, we have line numbers
 let g:airline_section_z = ''
@@ -95,6 +102,10 @@ inoremap <silent><expr> <TAB>  pumvisible() ? "\<C-n>" :  <SID>check_back_space(
 inoremap <silent><expr> <S-TAB>  pumvisible() ? "\<C-p>" :  "\<S-TAB>"
 
 
+let g:conjure#mapping#doc_word = "<localleader>K"
+let g:conjure#client#clojure#nrepl#test#runner = "kaocha"
+let g:conjure#highlight#enabled = v:true
+
 """"""""" custom keybindings
 " paredit slurp
 autocmd FileType clojure imap <buffer> <C-right> <C-o><Plug>(sexp_capture_next_element)
@@ -119,13 +130,30 @@ cnoremap <C-a> <Home>
 cnoremap <C-e> <End>
 cnoremap <C-d> <Delete>
 
-" FZF
-set rtp+=/opt/homebrew/opt/fzf
-set wildcharm=<tab> " so that it can be used below
+" edit next to the file
 nnoremap <Leader>fe :e %:h<tab>
-nnoremap <Leader>ff :GFiles<cr>
-nnoremap <Leader>fb :Buffers<cr>
-nnoremap <Leader>fg :Rg<cr>
+
+" FZF
+" set rtp+=/opt/homebrew/opt/fzf
+" set wildcharm=<tab> " so that it can be used below
+" nnoremap <Leader>fe :e %:h<tab>
+" nnoremap <Leader>ff :GFiles<cr>
+" nnoremap <Leader>fb :Buffers<cr>
+" nnoremap <Leader>fg :Rg<cr>
+"
+
+" telescope
+"
+"
+"
+
+nnoremap <leader>ff <cmd>Telescope find_files<cr>
+"nnoremap <leader>fg <cmd>Telescope live_grep<cr>
+nnoremap <leader>fg <cmd>lua require('telescope').extensions.live_grep_raw.live_grep_raw()<cr>
+nnoremap <leader>fb <cmd>Telescope buffers<cr>
+nnoremap <leader>fh <cmd>Telescope help_tags<cr>
+nnoremap <leader>fr <cmd>Telescope coc references<cr>
+nnoremap <leader>fs <cmd>Telescope coc document_symbols<cr>
 
 """
 
@@ -143,14 +171,31 @@ let g:ale_linters = {
 nnoremap <C-z> :echo "hi<" . synIDattr(synID(line("."),col("."),1),"name") . '> trans<' . synIDattr(synID(line("."),col("."),0),"name") ."> lo<" . synIDattr(synIDtrans(synID(line("."),col("."),1)),"name") . ">"<CR>
 
 " restart lsp
-function! LSPRestart()
-    lua vim.lsp.stop_client(vim.lsp.get_active_clients())
-    edit
-endfunction
-command LSPRestart call LSPRestart()
+" function! LSPLog()
+"     lua vim.cmd(":e"..vim.lsp.get_log_path())
+" endfunction
+" command LSPLog call LSPLog()
+" function! LSPDev()
+"     lua vim.lsp.stop_client(vim.lsp.get_active_clients())
+"     lua require('lspconfig').clojure_lsp_dev.autostart()
+" endfunction
+" command LSPDev call LSPDev()
 
 "
-"jump off to lua
+"
+function FugitiveToggle() abort
+  try
+    exe filter(getwininfo(), "get(v:val['variables'], 'fugitive_status', v:false) != v:false")[0].winnr .. "wincmd c"
+  catch /E684/
+    vertical Git
+    vertical resize 80
+  endtry
+endfunction
+nnoremap <Leader>g <cmd>call FugitiveToggle()<CR>
+
+source ~/.config/nvim/coc_config.vim
+
+" jump off to lua
 lua << EOF
   require'init'
 EOF
