@@ -1,0 +1,5 @@
+.clj-kondo/.cache
+.lsp/.cache
+.portal/vs-code.edn
+.calva/output-window
+.joyride/.nrepl-port
