@@ -132,7 +132,6 @@
        #js {:label "Connect Kourou" :fn connect-kourou}
        #js {:label "Open Portal" :fn open-portal}
        #js {:label "Ensure Portal Open" :fn ensure-portal-open}
-       #js {:label "Restart LSP" :fn restart-clojure-lsp}
        #js {:label "Say Hi" :fn #(info "Hi!")}])
 
 
@@ -140,7 +139,22 @@
   (p/let [command (vscode/window.showQuickPick
                    custom-commands
                    #js{:title "Select a custom command"})]
-    ((.-fn command))))
+    (when command
+      ((.-fn command)))))
+
+(def status-bar-item (vscode/window.createStatusBarItem
+                      "orestis-status-bar"
+                      vscode/StatusBarAlignment.Right
+                      1000))
+
+
+
+(set! (.-text status-bar-item) "OM")
+(set! (.-tooltip status-bar-item) "ctrl-cmd-P <space>")
+(set! (.-command status-bar-item)
+      #js {:command "joyride.runCode"
+           :arguments #js ["(orestis/show-my-commands)"]})
+(.show status-bar-item)
 
 
 ;; And then this shortcut definition in `keybindings.json`
